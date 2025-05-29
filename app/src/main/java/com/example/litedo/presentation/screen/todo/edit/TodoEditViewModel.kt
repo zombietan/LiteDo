@@ -1,6 +1,5 @@
 package com.example.litedo.presentation.screen.todo.edit
 
-import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,7 +11,6 @@ import com.example.litedo.R
 import com.example.litedo.data.repository.TodoRepository
 import com.example.litedo.injection.annotation.TimeFormatter
 import com.example.litedo.presentation.navigation.autoTypeMap
-import com.example.litedo.presentation.screen.todo.edit.TodoEditRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -72,7 +70,7 @@ class TodoEditViewModel @Inject constructor(
 
 
     sealed interface TodoEditEvent {
-        data class InvalidInput(@StringRes val message: Int) : TodoEditEvent
+        data class InvalidInput(val message: Int) : TodoEditEvent
         data object TodoUpdated : TodoEditEvent
     }
 }

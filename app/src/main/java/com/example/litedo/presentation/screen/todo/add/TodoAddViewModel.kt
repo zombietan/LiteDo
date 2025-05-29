@@ -1,6 +1,5 @@
 package com.example.litedo.presentation.screen.todo.add
 
-import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.litedo.R
 import com.example.litedo.data.model.TodoModel
-import com.example.litedo.data.repository.DataStoreRepository
 import com.example.litedo.data.repository.TodoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -58,7 +56,7 @@ class TodoAddViewModel @Inject constructor(
 
 
     sealed interface TodoAddEvent {
-        data class InvalidInput(@StringRes val message: Int) : TodoAddEvent
+        data class InvalidInput(val message: Int) : TodoAddEvent
         data object TodoAdded : TodoAddEvent
     }
 }

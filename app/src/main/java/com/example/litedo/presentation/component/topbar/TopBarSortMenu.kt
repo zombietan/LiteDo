@@ -1,6 +1,5 @@
 package com.example.litedo.presentation.component.topbar
 
-import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Done
@@ -44,8 +43,8 @@ fun TopBarSortMenu(
                         Icon(
                             imageVector = Icons.Default.Done,
                             contentDescription = stringResource(
-                                R.string.cd_selected_sort,
-                                stringResource(menu.title)
+                                id = R.string.cd_selected_sort,
+                                stringResource(id = menu.title)
                             )
                         )
                     }
@@ -53,11 +52,10 @@ fun TopBarSortMenu(
             )
         }
     }
-
 }
 
 data class SortMenu(
-    @StringRes val title: Int,
+    val title: Int,
     val sort: TodoSort
 )
 
