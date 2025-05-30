@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -13,6 +14,7 @@ import com.example.litedo.R
 import com.example.litedo.core.constant.TodoSort
 import com.example.litedo.presentation.component.text.TextPlain
 import com.example.litedo.presentation.theme.LiteDoTheme
+import com.example.litedo.presentation.theme.SemiTransparentUnspecified
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -38,6 +40,11 @@ fun TopBarSortMenu(
             DropdownMenuItem(
                 onClick = { onSort(menu.sort) },
                 text = { TextPlain(id = menu.title) },
+                text = {
+                    TextPlain(
+                        color = SemiTransparentUnspecified
+                    )
+                },
                 trailingIcon = {
                     if (sorting == menu.sort) {
                         Icon(
@@ -46,6 +53,7 @@ fun TopBarSortMenu(
                                 id = R.string.cd_selected_sort,
                                 stringResource(id = menu.title)
                             )
+                            tint = LocalContentColor.current.copy(alpha = 0.7f)
                         )
                     }
                 }
