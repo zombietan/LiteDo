@@ -87,8 +87,6 @@ dependencies {
     // collections
     implementation(libs.collections)
 
-    // firebase
-
     // hilt
     implementation(libs.hilt)
     ksp(libs.hilt.compiler)
