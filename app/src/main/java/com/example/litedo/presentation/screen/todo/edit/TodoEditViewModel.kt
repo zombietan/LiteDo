@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.litedo.R
-import com.example.litedo.data.repository.TodoRepository
+import com.example.litedo.domain.repository.TodoRepository
 import com.example.litedo.injection.annotation.TimeFormatter
 import com.example.litedo.presentation.navigation.autoTypeMap
 import dagger.hilt.android.lifecycle.HiltViewModel

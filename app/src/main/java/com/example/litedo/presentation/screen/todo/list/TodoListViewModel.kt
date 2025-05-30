@@ -9,8 +9,8 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.litedo.core.constant.TodoSort
 import com.example.litedo.data.model.TodoModel
-import com.example.litedo.data.repository.DataStoreRepository
-import com.example.litedo.data.repository.TodoRepository
+import com.example.litedo.domain.repository.DataStoreRepository
+import com.example.litedo.domain.repository.TodoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel

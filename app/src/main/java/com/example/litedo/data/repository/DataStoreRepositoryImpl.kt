@@ -10,26 +10,27 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.litedo.core.constant.DataStoreConst.PREFERENCE_HIDE_COMPLETED_KEY
 import com.example.litedo.core.constant.DataStoreConst.PREFERENCE_SORT_KEY
 import com.example.litedo.core.constant.TodoSort
+import com.example.litedo.domain.repository.DataStoreRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class DataStoreRepository @Inject constructor(
+class DataStoreRepositoryImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>
-) {
+): DataStoreRepository {
     private object PreferenceKeys {
         val sortKey = stringPreferencesKey(PREFERENCE_SORT_KEY)
         val hideCompletedKey = booleanPreferencesKey(PREFERENCE_HIDE_COMPLETED_KEY)
     }
 
-    suspend fun upsertSorting(value: TodoSort) {
+    override suspend fun upsertSorting(value: TodoSort) {
         dataStore.edit { preferences ->
             preferences[PreferenceKeys.sortKey] = value.name
         }
     }
 
-    val getSorting: Flow<TodoSort> = dataStore.data
+    override val getSorting: Flow<TodoSort> = dataStore.data
         .catch { exception ->
             if (exception is IOException)
                 emit(emptyPreferences())
@@ -41,13 +42,13 @@ class DataStoreRepository @Inject constructor(
             TodoSort.fromName(sortData)
         }
 
-    suspend fun upsertHideCompleted(value: Boolean) {
+    override suspend fun upsertHideCompleted(value: Boolean) {
         dataStore.edit { preferences ->
             preferences[PreferenceKeys.hideCompletedKey] = value
         }
     }
 
-    val getHideCompleted: Flow<Boolean> = dataStore.data
+    override val getHideCompleted: Flow<Boolean> = dataStore.data
         .catch { exception ->
             if (exception is IOException)
                 emit(emptyPreferences())

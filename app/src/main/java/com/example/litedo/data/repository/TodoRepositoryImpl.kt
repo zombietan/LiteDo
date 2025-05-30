@@ -9,48 +9,51 @@ import com.example.litedo.data.local.todo.dao.TodoDao
 import com.example.litedo.data.mapper.toEntity
 import com.example.litedo.data.mapper.toModel
 import com.example.litedo.data.model.TodoModel
+import com.example.litedo.domain.repository.TodoRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-class TodoRepository(private val dao: TodoDao, private val config: PagingConfig) {
+class TodoRepositoryImpl(
+    private val dao: TodoDao, private val config: PagingConfig
+) : TodoRepository {
 
     // Insert
-    suspend fun insertTodo(todo: TodoModel) {
+    override suspend fun insertTodo(todo: TodoModel) {
         withContext(Dispatchers.IO) {
             dao.insertTodo(todo.toEntity())
         }
     }
 
     // Update
-    suspend fun updateTodo(todo: TodoModel) {
+    override suspend fun updateTodo(todo: TodoModel) {
         withContext(Dispatchers.IO) {
             dao.updateTodo(todo.toEntity())
         }
     }
 
     // Delete
-    suspend fun deleteTodo(todo: TodoModel) {
+    override suspend fun deleteTodo(todo: TodoModel) {
         withContext(Dispatchers.IO) {
             dao.deleteTodo(todo.toEntity())
         }
     }
 
-    suspend fun deleteAllCompletedTodo() {
+    override suspend fun deleteAllCompletedTodo() {
         withContext(Dispatchers.IO) {
             dao.deleteAllCompletedTodo()
         }
     }
 
-    suspend fun deleteAllTodo() {
+    override suspend fun deleteAllTodo() {
         withContext(Dispatchers.IO) {
             dao.deleteAllTodo()
         }
     }
 
     // Get
-    fun getTodos(
+    override fun getTodos(
         query: String,
         hideCompleted: Boolean,
         sorting: TodoSort

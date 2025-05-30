@@ -7,7 +7,8 @@ import com.example.litedo.core.constant.PagingConst
 import com.example.litedo.data.local.todo.constant.TodoDatabaseConst
 import com.example.litedo.data.local.todo.dao.TodoDao
 import com.example.litedo.data.local.todo.database.TodoDatabase
-import com.example.litedo.data.repository.TodoRepository
+import com.example.litedo.data.repository.TodoRepositoryImpl
+import com.example.litedo.domain.repository.TodoRepository
 import com.example.litedo.injection.annotation.ApplicationScope
 import dagger.Module
 import dagger.Provides
@@ -57,7 +58,7 @@ object ApplicationModule {
     @Provides
     @Singleton
     fun provideTodoRepository(todoDao: TodoDao, pagingConfig: PagingConfig): TodoRepository =
-        TodoRepository(dao = todoDao, config = pagingConfig)
+        TodoRepositoryImpl(dao = todoDao, config = pagingConfig)
 
     @Provides
     @Singleton

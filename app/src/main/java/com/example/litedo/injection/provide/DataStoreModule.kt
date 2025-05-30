@@ -6,6 +6,8 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.example.litedo.core.constant.DataStoreConst.PREFERENCE_NAME
+import com.example.litedo.data.repository.DataStoreRepositoryImpl
+import com.example.litedo.domain.repository.DataStoreRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,4 +26,10 @@ object DataStoreModule {
     ): DataStore<Preferences> = PreferenceDataStoreFactory.create {
         context.preferencesDataStoreFile(PREFERENCE_NAME)
     }
+
+    @Provides
+    @Singleton
+    fun provideDataStoreRepository(
+        dataStore: DataStore<Preferences>
+    ): DataStoreRepository = DataStoreRepositoryImpl(dataStore)
 }
