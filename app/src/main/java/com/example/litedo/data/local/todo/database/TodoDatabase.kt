@@ -11,7 +11,8 @@ import com.example.litedo.data.local.todo.entity.TodoEntity
 @TypeConverters(TodoConverter::class)
 @Database(
     entities = [TodoEntity::class],
-    version = TodoDatabaseConst.VERSION
+    version = TodoDatabaseConst.VERSION,
+    exportSchema = TodoDatabaseConst.ROOM_DB_EXPORT_SCHEMA
 )
 abstract class TodoDatabase : RoomDatabase() {
     abstract fun todoDao(): TodoDao

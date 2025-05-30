@@ -6,4 +6,7 @@ object TodoDatabaseConst {
     const val VERSION = 1
 
     const val TABLE_TODO = "task_table"
+
+    // データベーススキーマをJSON形式で保存（エクスポート）
+    const val ROOM_DB_EXPORT_SCHEMA = false
 }
