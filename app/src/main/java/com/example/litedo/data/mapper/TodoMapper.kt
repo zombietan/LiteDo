@@ -1,7 +1,7 @@
 package com.example.litedo.data.mapper
 
 import com.example.litedo.data.local.todo.entity.TodoEntity
-import com.example.litedo.data.model.TodoModel
+import com.example.litedo.domain.model.TodoModel
 
 // Model
 fun TodoEntity.toModel(): TodoModel {

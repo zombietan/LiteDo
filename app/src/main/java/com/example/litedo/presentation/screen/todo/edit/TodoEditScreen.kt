@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.litedo.R
-import com.example.litedo.data.model.TodoModel
+import com.example.litedo.domain.model.TodoModel
 import com.example.litedo.presentation.component.button.TodoFloatingActionButton
 import com.example.litedo.presentation.component.misc.TodoConfigure
 import com.example.litedo.presentation.component.text.TextPlain

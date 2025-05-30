@@ -48,7 +48,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.litedo.R
-import com.example.litedo.data.model.TodoModel
+import com.example.litedo.domain.model.TodoModel
 import com.example.litedo.presentation.theme.Black
 import com.example.litedo.presentation.theme.LiteDoTheme
 import com.example.litedo.presentation.theme.White

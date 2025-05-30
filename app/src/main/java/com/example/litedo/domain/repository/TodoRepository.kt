@@ -2,7 +2,7 @@ package com.example.litedo.domain.repository
 
 import androidx.paging.PagingData
 import com.example.litedo.core.constant.TodoSort
-import com.example.litedo.data.model.TodoModel
+import com.example.litedo.domain.model.TodoModel
 import kotlinx.coroutines.flow.Flow
 
 interface TodoRepository {

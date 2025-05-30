@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.litedo.core.constant.TodoSort
-import com.example.litedo.data.model.TodoModel
+import com.example.litedo.domain.model.TodoModel
 import com.example.litedo.domain.repository.DataStoreRepository
 import com.example.litedo.domain.repository.TodoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

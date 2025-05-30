@@ -3,7 +3,7 @@ package com.example.litedo.presentation.navigation
 import android.net.Uri
 import androidx.navigation.NavType
 import androidx.savedstate.SavedState
-import com.example.litedo.data.model.TodoModel
+import com.example.litedo.domain.model.TodoModel
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor

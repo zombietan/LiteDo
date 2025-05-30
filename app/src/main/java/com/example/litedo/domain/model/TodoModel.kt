@@ -1,4 +1,4 @@
-package com.example.litedo.data.model
+package com.example.litedo.domain.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

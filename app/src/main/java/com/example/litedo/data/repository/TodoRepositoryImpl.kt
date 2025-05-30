@@ -8,7 +8,7 @@ import com.example.litedo.core.constant.TodoSort
 import com.example.litedo.data.local.todo.dao.TodoDao
 import com.example.litedo.data.mapper.toEntity
 import com.example.litedo.data.mapper.toModel
-import com.example.litedo.data.model.TodoModel
+import com.example.litedo.domain.model.TodoModel
 import com.example.litedo.domain.repository.TodoRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
