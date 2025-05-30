@@ -4,16 +4,10 @@ import android.net.Uri
 import androidx.navigation.NavType
 import androidx.savedstate.SavedState
 import com.example.litedo.domain.model.TodoModel
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.serializers.LocalDateTimeIso8601Serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 object CustomNavType {
     val TodoModelType = object : NavType<TodoModel>(isNullableAllowed = false) {
@@ -36,23 +30,8 @@ object CustomNavType {
     }
 }
 
-private object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
-    override val descriptor: SerialDescriptor
-        get() = PrimitiveSerialDescriptor("LocalDateTime", PrimitiveKind.STRING)
-
-    override fun serialize(encoder: Encoder, value: LocalDateTime) {
-        val str = value.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-        encoder.encodeString(str)
-    }
-
-    override fun deserialize(decoder: Decoder): LocalDateTime {
-        return LocalDateTime.parse(decoder.decodeString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-    }
-
-}
-
 private val module = SerializersModule {
-    contextual(LocalDateTime::class, LocalDateTimeSerializer)
+    contextual(LocalDateTime::class, LocalDateTimeIso8601Serializer)
 }
 
 private val json = Json {

@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.litedo.data.local.todo.constant.TodoDatabaseConst.TABLE_TODO
-import java.time.LocalDateTime
+import kotlinx.datetime.LocalDateTime
 
 @Entity(tableName = TABLE_TODO)
 data class TodoEntity(

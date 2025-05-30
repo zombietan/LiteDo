@@ -1,15 +1,18 @@
 package com.example.litedo.core.util
 
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 
 object TimeUtil {
+    private val zone = TimeZone.currentSystemDefault()
     fun fromLongToLocalDateTime(millis: Long): LocalDateTime {
-        return Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDateTime()
+        return Instant.fromEpochMilliseconds(millis).toLocalDateTime(zone)
     }
 
     fun fromLocalDateTimeToLong(date: LocalDateTime): Long {
-        return date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        return date.toInstant(zone).toEpochMilliseconds()
     }
 }

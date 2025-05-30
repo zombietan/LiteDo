@@ -2,7 +2,7 @@ package com.example.litedo.data.local.todo.converter
 
 import androidx.room.TypeConverter
 import com.example.litedo.core.util.TimeUtil
-import java.time.LocalDateTime
+import kotlinx.datetime.LocalDateTime
 
 class TodoConverter {
     @TypeConverter

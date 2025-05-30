@@ -16,6 +16,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.toJavaLocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
@@ -36,7 +37,9 @@ class TodoEditViewModel @Inject constructor(
     var important: Boolean by mutableStateOf(navArg.todo.important)
         private set
 
-    val timestamp: String by mutableStateOf(formatter.format(navArg.todo.timestamp))
+    val timestamp: String by mutableStateOf(
+        navArg.todo.timestamp.toJavaLocalDateTime().format(formatter)
+    )
 
     private val _event = Channel<TodoEditEvent>()
     val event: Flow<TodoEditEvent> = _event.receiveAsFlow()
