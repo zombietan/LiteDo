@@ -17,6 +17,8 @@ val Black = Color(0xFF000000)
 val White = Color(0xFFFFFFFF)
 val BrownGrey = Color(0xFFB19581)
 
+val SemiTransparentUnspecified = Color.Unspecified.copy(alpha = 0.7f)
+
 @Composable
 fun ColorScheme.backgroundDialogButton(): Color {
     return if (isSystemInDarkTheme()) BrownGrey else primary
