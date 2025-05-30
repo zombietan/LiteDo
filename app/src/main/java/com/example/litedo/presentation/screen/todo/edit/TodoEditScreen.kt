@@ -60,7 +60,7 @@ fun TodoEditScreen(
         onEvent = { event ->
             when (event) {
                 is TodoEditViewModel.TodoEditEvent.InvalidInput -> {
-                    snackbar.showSnackbar(context.getString(event.message))
+                    snackbar.showSnackbar(context.getString(event.messageResId))
                 }
 
                 TodoEditViewModel.TodoEditEvent.TodoUpdated -> {

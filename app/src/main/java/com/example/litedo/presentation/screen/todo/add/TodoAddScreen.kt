@@ -44,7 +44,7 @@ fun TodoAddScreen(
         onEvent = { event ->
             when (event) {
                 is TodoAddViewModel.TodoAddEvent.InvalidInput -> {
-                    snackbar.showSnackbar(context.getString(event.message))
+                    snackbar.showSnackbar(context.getString(event.messageResId))
                 }
 
                 TodoAddViewModel.TodoAddEvent.TodoAdded -> {

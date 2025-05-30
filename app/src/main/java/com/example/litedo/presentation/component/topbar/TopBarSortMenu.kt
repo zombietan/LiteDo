@@ -39,9 +39,9 @@ fun TopBarSortMenu(
         menus.forEach { menu: SortMenu ->
             DropdownMenuItem(
                 onClick = { onSort(menu.sort) },
-                text = { TextPlain(id = menu.title) },
                 text = {
                     TextPlain(
+                        id = menu.titleResId,
                         color = SemiTransparentUnspecified
                     )
                 },
@@ -51,8 +51,8 @@ fun TopBarSortMenu(
                             imageVector = Icons.Default.Done,
                             contentDescription = stringResource(
                                 id = R.string.cd_selected_sort,
-                                stringResource(id = menu.title)
-                            )
+                                stringResource(id = menu.titleResId)
+                            ),
                             tint = LocalContentColor.current.copy(alpha = 0.7f)
                         )
                     }
@@ -63,17 +63,17 @@ fun TopBarSortMenu(
 }
 
 data class SortMenu(
-    val title: Int,
+    val titleResId: Int,
     val sort: TodoSort
 )
 
 private val SORT_MENUS: ImmutableList<SortMenu> = persistentListOf(
     SortMenu(
-        title = R.string.sort_by_name,
+        titleResId = R.string.sort_by_name,
         sort = TodoSort.Name
     ),
     SortMenu(
-        title = R.string.sort_by_date,
+        titleResId = R.string.sort_by_date,
         sort = TodoSort.Date
     )
 )

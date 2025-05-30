@@ -56,7 +56,7 @@ class TodoAddViewModel @Inject constructor(
 
 
     sealed interface TodoAddEvent {
-        data class InvalidInput(val message: Int) : TodoAddEvent
+        data class InvalidInput(val messageResId: Int) : TodoAddEvent
         data object TodoAdded : TodoAddEvent
     }
 }

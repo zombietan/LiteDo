@@ -70,7 +70,7 @@ class TodoEditViewModel @Inject constructor(
 
 
     sealed interface TodoEditEvent {
-        data class InvalidInput(val message: Int) : TodoEditEvent
+        data class InvalidInput(val messageResId: Int) : TodoEditEvent
         data object TodoUpdated : TodoEditEvent
     }
 }
