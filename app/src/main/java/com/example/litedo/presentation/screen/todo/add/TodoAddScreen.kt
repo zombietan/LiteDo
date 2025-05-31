@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -109,8 +111,11 @@ private fun TodoAddContent(
             SnackbarHost(
                 hostState = snackbar
             ) { data ->
+                val isError = data.visuals.message.startsWith("Error:")
                 Snackbar(
-                    snackbarData = data
+                    snackbarData = data,
+                    containerColor = if (isError) MaterialTheme.colorScheme.error
+                    else SnackbarDefaults.color
                 )
             }
         },

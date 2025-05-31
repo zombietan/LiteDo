@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.litedo.R
 import com.example.litedo.domain.model.TodoModel
 import com.example.litedo.domain.repository.TodoRepository
+import com.example.litedo.presentation.screen.todo.edit.TodoEditViewModel.TodoEditEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -78,7 +79,7 @@ class TodoAddViewModel @Inject constructor(
                 )
                 _event.send(TodoAddEvent.TodoAdded)
             } catch (e: Exception) {
-                _event.send(TodoAddEvent.Error(e.message.toString()))
+                _event.send(TodoAddEvent.Error("Error: ${e.message.toString()}"))
             }
         }
     }

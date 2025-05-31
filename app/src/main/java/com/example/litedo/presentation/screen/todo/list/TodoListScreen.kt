@@ -7,8 +7,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -64,18 +66,20 @@ fun TodoListScreen(
     ObserveEvent(
         flow = viewModel.event,
         onEvent = { event ->
-            when (event) {
-                TodoListViewModel.TodoListEvent.TodoDeleted -> {
-                    val result = snackbar.showSnackbar(
-                        message = context.getString(R.string.deleted_successfully),
-                        actionLabel = context.getString(R.string.undo),
-                        duration = SnackbarDuration.Short
-                    )
-                    if (result == SnackbarResult.ActionPerformed) viewModel.onUndoDeletedTodo()
-                }
+            if (snackbar.currentSnackbarData == null) {
+                when (event) {
+                    TodoListViewModel.TodoListEvent.TodoDeleted -> {
+                        val result = snackbar.showSnackbar(
+                            message = context.getString(R.string.deleted_successfully),
+                            actionLabel = context.getString(R.string.undo),
+                            duration = SnackbarDuration.Short
+                        )
+                        if (result == SnackbarResult.ActionPerformed) viewModel.onUndoDeletedTodo()
+                    }
 
-                is TodoListViewModel.TodoListEvent.Error -> {
-                    snackbar.showSnackbar(event.errorMessage)
+                    is TodoListViewModel.TodoListEvent.Error -> {
+                        snackbar.showSnackbar(event.errorMessage)
+                    }
                 }
             }
         }
@@ -186,8 +190,11 @@ private fun TodoListContent(
             SnackbarHost(
                 hostState = snackbar
             ) { data ->
+                val isError = data.visuals.message.startsWith("Error:")
                 Snackbar(
-                    snackbarData = data
+                    snackbarData = data,
+                    containerColor = if (isError) MaterialTheme.colorScheme.error
+                    else SnackbarDefaults.color
                 )
             }
         },

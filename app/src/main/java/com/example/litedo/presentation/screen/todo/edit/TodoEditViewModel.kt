@@ -100,7 +100,7 @@ class TodoEditViewModel @Inject constructor(
 
                 _event.send(TodoEditEvent.TodoUpdated)
             } catch (e: Exception) {
-                _event.send(TodoEditEvent.Error(e.message.toString()))
+                _event.send(TodoEditEvent.Error("Error: ${e.message.toString()}"))
             }
         }
     }

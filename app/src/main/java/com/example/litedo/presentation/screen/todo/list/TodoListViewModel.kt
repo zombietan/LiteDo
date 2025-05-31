@@ -171,7 +171,7 @@ class TodoListViewModel @Inject constructor(
                     todo.copy(completed = checked)
                 )
             } catch (e: Exception) {
-                _event.send(TodoListEvent.Error(e.message.toString()))
+                _event.send(TodoListEvent.Error("Error: ${e.message.toString()}"))
             }
         }
     }
@@ -183,7 +183,7 @@ class TodoListViewModel @Inject constructor(
                 repository.deleteTodo(todo)
                 _event.send(TodoListEvent.TodoDeleted)
             } catch (e: Exception) {
-                _event.send(TodoListEvent.Error(e.message.toString()))
+                _event.send(TodoListEvent.Error("Error: ${e.message.toString()}"))
                 deletedTodo = null
             }
         }
@@ -199,7 +199,7 @@ class TodoListViewModel @Inject constructor(
                 }
                 deletedTodo = null
             } catch (e: Exception) {
-                _event.send(TodoListEvent.Error(e.message.toString()))
+                _event.send(TodoListEvent.Error("Error: ${e.message.toString()}"))
                 deletedTodo = null
             }
         }
@@ -259,7 +259,7 @@ class TodoListViewModel @Inject constructor(
                 repository.deleteAllCompletedTodo()
                 onDeleteCompletedDismiss()
             } catch (e: Exception) {
-                _event.send(TodoListEvent.Error(e.message.toString()))
+                _event.send(TodoListEvent.Error("Error: ${e.message.toString()}"))
                 onDeleteCompletedDismiss()
             }
         }
@@ -280,7 +280,7 @@ class TodoListViewModel @Inject constructor(
                 repository.deleteAllTodo()
                 onDeleteAllDismiss()
             } catch (e: Exception) {
-                _event.send(TodoListEvent.Error(e.message.toString()))
+                _event.send(TodoListEvent.Error("Error: ${e.message.toString()}"))
                 onDeleteAllDismiss()
             }
         }
