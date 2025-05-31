@@ -54,6 +54,10 @@ fun TodoAddScreen(
                 TodoAddViewModel.TodoAddEvent.TodoAdded -> {
                     navController.popBackStack()
                 }
+
+                is TodoAddViewModel.TodoAddEvent.Error -> {
+                    snackbar.showSnackbar(event.errorMessage)
+                }
             }
         }
     )
@@ -69,7 +73,7 @@ fun TodoAddScreen(
 }
 
 @Composable
-fun TodoAddContent(
+private fun TodoAddContent(
     snackbar: SnackbarHostState,
     onAction: (TodoAddAction) -> Unit,
     onNavigateBack: () -> Unit,

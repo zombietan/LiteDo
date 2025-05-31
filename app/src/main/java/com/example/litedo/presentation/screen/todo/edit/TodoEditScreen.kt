@@ -77,6 +77,10 @@ fun TodoEditScreen(
                 TodoEditViewModel.TodoEditEvent.TodoUpdated -> {
                     navController.popBackStack()
                 }
+
+                is TodoEditViewModel.TodoEditEvent.Error -> {
+                    snackbar.showSnackbar(event.errorMessage)
+                }
             }
         }
     )
@@ -93,7 +97,7 @@ fun TodoEditScreen(
 }
 
 @Composable
-fun TodoEditContent(
+private fun TodoEditContent(
     snackbar: SnackbarHostState,
     onAction: (TodoEditAction) -> Unit,
     onNavigateBack: () -> Unit,

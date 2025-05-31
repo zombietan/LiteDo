@@ -164,33 +164,44 @@ class TodoListViewModel @Inject constructor(
         _query.value = value
     }
 
-    fun onTodoChecked(
-        todo: TodoModel,
-        checked: Boolean
-    ) {
+    fun onTodoChecked(todo: TodoModel, checked: Boolean) {
         viewModelScope.launch {
-            repository.updateTodo(
-                todo.copy(completed = checked)
-            )
+            try {
+                repository.updateTodo(
+                    todo.copy(completed = checked)
+                )
+            } catch (e: Exception) {
+                _event.send(TodoListEvent.Error(e.message.toString()))
+            }
         }
     }
 
     fun onTodoDelete(todo: TodoModel) {
         viewModelScope.launch {
-            deletedTodo = todo
-            repository.deleteTodo(todo)
-            _event.send(TodoListEvent.TodoDeleted)
+            try {
+                deletedTodo = todo
+                repository.deleteTodo(todo)
+                _event.send(TodoListEvent.TodoDeleted)
+            } catch (e: Exception) {
+                _event.send(TodoListEvent.Error(e.message.toString()))
+                deletedTodo = null
+            }
         }
     }
 
     fun onUndoDeletedTodo() {
         viewModelScope.launch {
-            deletedTodo?.let { todo ->
-                repository.insertTodo(
-                    todo.copy(id = 0)
-                )
+            try {
+                deletedTodo?.let { todo ->
+                    repository.insertTodo(
+                        todo.copy(id = 0)
+                    )
+                }
+                deletedTodo = null
+            } catch (e: Exception) {
+                _event.send(TodoListEvent.Error(e.message.toString()))
+                deletedTodo = null
             }
-            deletedTodo = null
         }
     }
 
@@ -244,8 +255,13 @@ class TodoListViewModel @Inject constructor(
 
     fun onDeleteCompleted() {
         viewModelScope.launch {
-            repository.deleteAllCompletedTodo()
-            onDeleteCompletedDismiss()
+            try {
+                repository.deleteAllCompletedTodo()
+                onDeleteCompletedDismiss()
+            } catch (e: Exception) {
+                _event.send(TodoListEvent.Error(e.message.toString()))
+                onDeleteCompletedDismiss()
+            }
         }
     }
 
@@ -260,13 +276,18 @@ class TodoListViewModel @Inject constructor(
 
     fun onDeleteAll() {
         viewModelScope.launch {
-            repository.deleteAllTodo()
-            onDeleteAllDismiss()
+            try {
+                repository.deleteAllTodo()
+                onDeleteAllDismiss()
+            } catch (e: Exception) {
+                _event.send(TodoListEvent.Error(e.message.toString()))
+                onDeleteAllDismiss()
+            }
         }
     }
 
-
-    enum class TodoListEvent {
-        TodoDeleted,
+    sealed interface TodoListEvent {
+        data object TodoDeleted : TodoListEvent
+        data class Error(val errorMessage: String) : TodoListEvent
     }
 }

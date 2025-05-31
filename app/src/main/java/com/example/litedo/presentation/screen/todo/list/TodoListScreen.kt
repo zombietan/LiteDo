@@ -74,6 +74,9 @@ fun TodoListScreen(
                     if (result == SnackbarResult.ActionPerformed) viewModel.onUndoDeletedTodo()
                 }
 
+                is TodoListViewModel.TodoListEvent.Error -> {
+                    snackbar.showSnackbar(event.errorMessage)
+                }
             }
         }
     )
@@ -100,7 +103,7 @@ fun TodoListScreen(
 }
 
 @Composable
-fun TodoListContent(
+private fun TodoListContent(
     snackbar: SnackbarHostState,
     query: String,
     todos: LazyPagingItems<TodoModel>,

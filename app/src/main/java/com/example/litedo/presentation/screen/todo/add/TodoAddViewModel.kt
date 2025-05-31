@@ -69,19 +69,24 @@ class TodoAddViewModel @Inject constructor(
                 _event.send(TodoAddEvent.InvalidInput(R.string.error_name))
                 return@launch
             }
-            repository.insertTodo(
-                TodoModel(
-                    name = uiState.value.name,
-                    important = uiState.value.important
+            try {
+                repository.insertTodo(
+                    TodoModel(
+                        name = uiState.value.name,
+                        important = uiState.value.important
+                    )
                 )
-            )
-            _event.send(TodoAddEvent.TodoAdded)
+                _event.send(TodoAddEvent.TodoAdded)
+            } catch (e: Exception) {
+                _event.send(TodoAddEvent.Error(e.message.toString()))
+            }
         }
     }
 
 
     sealed interface TodoAddEvent {
         data class InvalidInput(val messageResId: Int) : TodoAddEvent
+        data class Error(val errorMessage: String) : TodoAddEvent
         data object TodoAdded : TodoAddEvent
     }
 }

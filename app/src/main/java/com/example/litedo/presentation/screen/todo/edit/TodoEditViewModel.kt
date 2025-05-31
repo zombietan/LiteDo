@@ -90,21 +90,25 @@ class TodoEditViewModel @Inject constructor(
                 _event.send(TodoEditEvent.InvalidInput(R.string.error_name))
                 return@launch
             }
-
-            repository.updateTodo(
-                navArg.todo.copy(
-                    name = uiState.value.name,
-                    important = uiState.value.important
+            try {
+                repository.updateTodo(
+                    navArg.todo.copy(
+                        name = uiState.value.name,
+                        important = uiState.value.important
+                    )
                 )
-            )
 
-            _event.send(TodoEditEvent.TodoUpdated)
+                _event.send(TodoEditEvent.TodoUpdated)
+            } catch (e: Exception) {
+                _event.send(TodoEditEvent.Error(e.message.toString()))
+            }
         }
     }
 
 
     sealed interface TodoEditEvent {
         data class InvalidInput(val messageResId: Int) : TodoEditEvent
+        data class Error(val errorMessage: String) : TodoEditEvent
         data object TodoUpdated : TodoEditEvent
     }
 }
