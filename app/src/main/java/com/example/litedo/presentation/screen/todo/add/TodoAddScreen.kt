@@ -13,10 +13,13 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.litedo.R
 import com.example.litedo.presentation.component.button.TodoFloatingActionButton
@@ -24,8 +27,8 @@ import com.example.litedo.presentation.component.misc.TodoConfigure
 import com.example.litedo.presentation.component.text.TextPlain
 import com.example.litedo.presentation.component.topbar.TopBar
 import com.example.litedo.presentation.component.topbar.TopBarIconButton
+import com.example.litedo.presentation.theme.LiteDoTheme
 import com.example.litedo.presentation.util.ObserveEvent
-
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -38,6 +41,7 @@ fun TodoAddScreen(
     viewModel: TodoAddViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ObserveEvent(
         flow = viewModel.event,
@@ -54,6 +58,23 @@ fun TodoAddScreen(
         }
     )
 
+    TodoAddContent(
+        snackbar = snackbar,
+        onAction = viewModel::onAction,
+        onNavigateBack = {
+            navController.navigateUp()
+        },
+        uiState = uiState
+    )
+}
+
+@Composable
+fun TodoAddContent(
+    snackbar: SnackbarHostState,
+    onAction: (TodoAddAction) -> Unit,
+    onNavigateBack: () -> Unit,
+    uiState: TodoAddUiState
+) {
     Scaffold(
         topBar = {
             TopBar(
@@ -64,7 +85,7 @@ fun TodoAddScreen(
                 },
                 navigationIcon = {
                     TopBarIconButton(
-                        onClick = { navController.navigateUp() },
+                        onClick = onNavigateBack,
                         icon = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = R.string.cd_back_button
                     )
@@ -73,7 +94,9 @@ fun TodoAddScreen(
         },
         floatingActionButton = {
             TodoFloatingActionButton(
-                onClick = viewModel::onSaveTodo,
+                onClick = {
+                    onAction(TodoAddAction.SaveTodo)
+                },
                 icon = Icons.Default.Done,
                 contentDescription = R.string.cd_done_button
             )
@@ -95,12 +118,29 @@ fun TodoAddScreen(
                 .padding(padding)
         ) {
             TodoConfigure(
-                name = viewModel.name,
-                onNameChange = viewModel::onNameChange,
-                important = viewModel.important,
-                onImportantChange = viewModel::onImportantChange
+                name = uiState.name,
+                onNameChange = {
+                    onAction(TodoAddAction.NameChange(name = it))
+                },
+                important = uiState.important,
+                onImportantChange = {
+                    onAction(TodoAddAction.ImportantChange(important = it))
+                }
             )
 
         }
+    }
+}
+
+@Preview
+@Composable
+private fun TodoAddContentPreview() {
+    LiteDoTheme {
+        TodoAddContent(
+            snackbar = remember { SnackbarHostState() },
+            onAction = { _ -> },
+            onNavigateBack = {},
+            uiState = TodoAddUiState()
+        )
     }
 }

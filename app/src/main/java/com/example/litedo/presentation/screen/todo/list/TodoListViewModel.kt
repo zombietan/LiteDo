@@ -1,8 +1,5 @@
 package com.example.litedo.presentation.screen.todo.list
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -21,39 +18,52 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+data class TodoListUiState(
+    val searchExpanded: Boolean = false,
+    val menuExpanded: Boolean = false,
+    val sortExpanded: Boolean = false,
+    val hideCompleted: Boolean = false,
+    val sorting: TodoSort? = null,
+    val deleteCompletedShown: Boolean = false,
+    val deleteAllShown: Boolean = false,
+)
+
+sealed interface TodoListAction {
+    data class QueryChange(val query: String) : TodoListAction
+    data object SearchCollapsed : TodoListAction
+    data object SearchExpanded : TodoListAction
+    data object SortExpanded : TodoListAction
+    data object SortCollapsed : TodoListAction
+    data class Sort(val todoSort: TodoSort) : TodoListAction
+    data object MenuExpanded : TodoListAction
+    data object MenuCollapsed : TodoListAction
+    data object HideCompletedChange : TodoListAction
+    data object DeleteCompletedShow : TodoListAction
+    data object DeleteAllShow : TodoListAction
+    data class TodoChecked(val todo: TodoModel, val checked: Boolean) : TodoListAction
+    data class TodoDelete(val todo: TodoModel) : TodoListAction
+    data object DeleteCompletedDismiss : TodoListAction
+    data object DeleteCompleted : TodoListAction
+    data object DeleteAllDismiss : TodoListAction
+    data object DeleteAll : TodoListAction
+}
 
 
 @HiltViewModel
 class TodoListViewModel @Inject constructor(
     private val repository: TodoRepository,
     private val dataStoreRepository: DataStoreRepository
-): ViewModel() {
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(TodoListUiState())
+    val uiState: StateFlow<TodoListUiState> = _uiState.asStateFlow()
 
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query.asStateFlow()
-
-    var searchExpanded: Boolean by mutableStateOf(false)
-        private set
-
-    var menuExpanded: Boolean by mutableStateOf(false)
-        private set
-
-    var sortExpanded: Boolean by mutableStateOf(false)
-        private set
-
-    var hideCompleted: Boolean by mutableStateOf(false)
-        private set
-
-    var sorting: TodoSort? by mutableStateOf<TodoSort?>(null)
-        private set
-
-    var deleteCompletedShown: Boolean by mutableStateOf(false)
-        private set
-
-    var deleteAllShown: Boolean by mutableStateOf(false)
-        private set
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val todos: Flow<PagingData<TodoModel>> =
@@ -64,8 +74,8 @@ class TodoListViewModel @Inject constructor(
         ) { query, sorting, hideCompleted ->
             Triple(query, sorting, hideCompleted)
         }.flatMapLatest { (query, sorting, hideCompleted) ->
-            this@TodoListViewModel.hideCompleted = hideCompleted
-            this@TodoListViewModel.sorting = sorting
+            this@TodoListViewModel._uiState.update { it.copy(hideCompleted = hideCompleted) }
+            this@TodoListViewModel._uiState.update { it.copy(sorting = sorting) }
             repository.getTodos(
                 query = query,
                 hideCompleted = hideCompleted,
@@ -78,10 +88,80 @@ class TodoListViewModel @Inject constructor(
 
     private var deletedTodo: TodoModel? = null
 
-    fun onQueryChange(value: String) {
-        viewModelScope.launch {
-            _query.emit(value)
+    fun onAction(action: TodoListAction) {
+        when (action) {
+            TodoListAction.DeleteAll -> {
+                onDeleteAll()
+            }
+
+            TodoListAction.DeleteAllDismiss -> {
+                onDeleteAllDismiss()
+            }
+
+            TodoListAction.DeleteAllShow -> {
+                onDeleteAllShow()
+            }
+
+            TodoListAction.DeleteCompleted -> {
+                onDeleteCompleted()
+            }
+
+            TodoListAction.DeleteCompletedDismiss -> {
+                onDeleteCompletedDismiss()
+            }
+
+            TodoListAction.DeleteCompletedShow -> {
+                onDeleteCompletedShow()
+            }
+
+            TodoListAction.HideCompletedChange -> {
+                onHideCompletedChange()
+            }
+
+            TodoListAction.MenuCollapsed -> {
+                onMenuCollapsed()
+            }
+
+            TodoListAction.MenuExpanded -> {
+                onMenuExpanded()
+            }
+
+            is TodoListAction.QueryChange -> {
+                onQueryChange(action.query)
+            }
+
+            TodoListAction.SearchExpanded -> {
+                onSearchExpanded()
+            }
+
+            is TodoListAction.Sort -> {
+                onSort(action.todoSort)
+            }
+
+            TodoListAction.SortCollapsed -> {
+                onSortCollapsed()
+            }
+
+            TodoListAction.SortExpanded -> {
+                onSortExpanded()
+            }
+
+            is TodoListAction.TodoChecked -> {
+                onTodoChecked(action.todo, action.checked)
+            }
+
+            is TodoListAction.TodoDelete -> {
+                onTodoDelete(action.todo)
+            }
+
+            TodoListAction.SearchCollapsed -> {
+                onSearchCollapsed()
+            }
         }
+    }
+
+    fun onQueryChange(value: String) {
+        _query.value = value
     }
 
     fun onTodoChecked(
@@ -115,30 +195,28 @@ class TodoListViewModel @Inject constructor(
     }
 
     fun onSearchExpanded() {
-        searchExpanded = true
+        _uiState.update { it.copy(searchExpanded = true) }
     }
 
     fun onSearchCollapsed() {
-        viewModelScope.launch {
-            _query.emit("")
-            searchExpanded = false
-        }
+        _query.value = ""
+        _uiState.update { it.copy(searchExpanded = false) }
     }
 
     fun onMenuExpanded() {
-        menuExpanded = true
+        _uiState.update { it.copy(menuExpanded = true) }
     }
 
     fun onMenuCollapsed() {
-        menuExpanded = false
+        _uiState.update { it.copy(menuExpanded = false) }
     }
 
     fun onSortExpanded() {
-        sortExpanded = true
+        _uiState.update { it.copy(sortExpanded = true) }
     }
 
     fun onSortCollapsed() {
-        sortExpanded = false
+        _uiState.update { it.copy(sortExpanded = false) }
     }
 
     fun onSort(sort: TodoSort) {
@@ -150,18 +228,18 @@ class TodoListViewModel @Inject constructor(
 
     fun onHideCompletedChange() {
         viewModelScope.launch {
-            dataStoreRepository.upsertHideCompleted(!hideCompleted)
+            dataStoreRepository.upsertHideCompleted(!uiState.value.hideCompleted)
             onMenuCollapsed()
         }
     }
 
     fun onDeleteCompletedShow() {
-        deleteCompletedShown = true
+        _uiState.update { it.copy(deleteCompletedShown = true) }
         onMenuCollapsed()
     }
 
     fun onDeleteCompletedDismiss() {
-        deleteCompletedShown = false
+        _uiState.update { it.copy(deleteCompletedShown = false) }
     }
 
     fun onDeleteCompleted() {
@@ -172,12 +250,12 @@ class TodoListViewModel @Inject constructor(
     }
 
     fun onDeleteAllShow() {
-        deleteAllShown = true
+        _uiState.update { it.copy(deleteAllShown = true) }
         onMenuCollapsed()
     }
 
     fun onDeleteAllDismiss() {
-        deleteAllShown = false
+        _uiState.update { it.copy(deleteAllShown = false) }
     }
 
     fun onDeleteAll() {

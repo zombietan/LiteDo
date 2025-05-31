@@ -18,15 +18,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.example.litedo.R
+import com.example.litedo.domain.model.TodoModel
 import com.example.litedo.presentation.component.button.TodoFloatingActionButton
 import com.example.litedo.presentation.component.card.CardTodo
 import com.example.litedo.presentation.component.dialog.TodoAlertDialog
@@ -38,7 +42,9 @@ import com.example.litedo.presentation.component.topbar.TopBarSearch
 import com.example.litedo.presentation.component.topbar.TopBarSortMenu
 import com.example.litedo.presentation.screen.todo.add.TodoAddRoute
 import com.example.litedo.presentation.screen.todo.edit.TodoEditRoute
+import com.example.litedo.presentation.theme.LiteDoTheme
 import com.example.litedo.presentation.util.ObserveEvent
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -53,6 +59,7 @@ fun TodoListScreen(
     val context = LocalContext.current
     val todos = viewModel.todos.collectAsLazyPagingItems()
     val query by viewModel.query.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ObserveEvent(
         flow = viewModel.event,
@@ -76,52 +83,98 @@ fun TodoListScreen(
         onEvent = {}
     )
 
+    TodoListContent(
+        snackbar = snackbar,
+        query = query,
+        todos = todos,
+        onAction = viewModel::onAction,
+        onNavigateTodoEdit = {
+            navController.navigate(TodoEditRoute(it))
+        },
+        onNavigateTodoAdd = {
+            navController.navigate(TodoAddRoute)
+        },
+        uiState = uiState
+    )
+
+}
+
+@Composable
+fun TodoListContent(
+    snackbar: SnackbarHostState,
+    query: String,
+    todos: LazyPagingItems<TodoModel>,
+    onAction: (TodoListAction) -> Unit,
+    onNavigateTodoEdit: (TodoModel) -> Unit,
+    onNavigateTodoAdd: () -> Unit,
+    uiState: TodoListUiState
+) {
     Scaffold(
         topBar = {
             TopBar(
                 title = {
-                    if (viewModel.searchExpanded) {
+                    if (uiState.searchExpanded) {
                         TopBarSearch(
                             query = query,
-                            onQueryChange = viewModel::onQueryChange,
-                            onCancel = viewModel::onSearchCollapsed
+                            onQueryChange = {
+                                onAction(TodoListAction.QueryChange(it))
+                            },
+                            onCancel = {
+                                onAction(TodoListAction.SearchCollapsed)
+                            }
                         )
                     } else {
                         TextPlain(id = R.string.tasks)
                     }
                 },
                 actions = {
-                    if (!viewModel.searchExpanded) {
+                    if (!uiState.searchExpanded) {
                         TopBarIconButton(
-                            onClick = viewModel::onSearchExpanded,
+                            onClick = {
+                                onAction(TodoListAction.SearchExpanded)
+                            },
                             icon = Icons.Default.Search,
                             contentDescription = R.string.cd_search_button
                         )
                     }
                     TopBarSortMenu(
-                        expanded = viewModel.sortExpanded,
-                        sorting = viewModel.sorting,
-                        onExpand = viewModel::onSortExpanded,
-                        onDismiss = viewModel::onSortCollapsed,
-                        onSort = viewModel::onSort
+                        expanded = uiState.sortExpanded,
+                        sorting = uiState.sorting,
+                        onExpand = {
+                            onAction(TodoListAction.SortExpanded)
+                        },
+                        onDismiss = {
+                            onAction(TodoListAction.SortCollapsed)
+                        },
+                        onSort = {
+                            onAction(TodoListAction.Sort(it))
+                        }
                     )
                     TopBarMoreMenu(
-                        expanded = viewModel.menuExpanded,
-                        onExpand = viewModel::onMenuExpanded,
-                        onDismiss = viewModel::onMenuCollapsed,
-                        hideCompleted = viewModel.hideCompleted,
-                        onHideCompletedChange = viewModel::onHideCompletedChange,
-                        onDeleteCompletedClick = viewModel::onDeleteCompletedShow,
-                        onDeleteAllClick = viewModel::onDeleteAllShow,
+                        expanded = uiState.menuExpanded,
+                        onExpand = {
+                            onAction(TodoListAction.MenuExpanded)
+                        },
+                        onDismiss = {
+                            onAction(TodoListAction.MenuCollapsed)
+                        },
+                        hideCompleted = uiState.hideCompleted,
+                        onHideCompletedChange = {
+                            onAction(TodoListAction.HideCompletedChange)
+                        },
+                        onDeleteCompletedClick = {
+                            onAction(TodoListAction.DeleteCompletedShow)
+                        },
+                        onDeleteAllClick = {
+                            onAction(TodoListAction.DeleteAllShow)
+                        }
                     )
                 },
             )
         },
         floatingActionButton = {
             TodoFloatingActionButton(
-                onClick = {
-                    navController.navigate(TodoAddRoute)
-                },
+                onClick = onNavigateTodoAdd,
                 icon = Icons.Default.Add,
                 contentDescription = R.string.cd_task_add
             )
@@ -154,30 +207,76 @@ fun TodoListScreen(
                 if (todo != null) {
                     CardTodo(
                         todo = todo,
-                        onClick = {
-                            navController.navigate(TodoEditRoute(it))
+                        onClick = onNavigateTodoEdit,
+                        onCheckedChange = { todo: TodoModel, checked: Boolean ->
+                            onAction(TodoListAction.TodoChecked(todo = todo, checked = checked))
                         },
-                        onCheckedChange = viewModel::onTodoChecked,
-                        onDismiss = viewModel::onTodoDelete
+                        onDismiss = {
+                            onAction(TodoListAction.TodoDelete(todo = it))
+                        }
                     )
                 }
             }
         }
-        if (viewModel.deleteCompletedShown) {
+        if (uiState.deleteCompletedShown) {
             TodoAlertDialog(
                 title = R.string.confirm_deletion,
                 message = R.string.wanna_delete_completed,
-                onDismiss = viewModel::onDeleteCompletedDismiss,
-                onConfirm = viewModel::onDeleteCompleted
+                onDismiss = {
+                    onAction(TodoListAction.DeleteCompletedDismiss)
+                },
+                onConfirm = {
+                    onAction(TodoListAction.DeleteCompleted)
+                }
+
             )
         }
-        if (viewModel.deleteAllShown) {
+        if (uiState.deleteAllShown) {
             TodoAlertDialog(
                 title = R.string.confirm_deletion,
                 message = R.string.wanna_delete_all,
-                onDismiss = viewModel::onDeleteAllDismiss,
-                onConfirm = viewModel::onDeleteAll
+                onDismiss = {
+                    onAction(TodoListAction.DeleteAllDismiss)
+                },
+                onConfirm = {
+                    onAction(TodoListAction.DeleteAll)
+                }
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun TodoListContentPreview() {
+    LiteDoTheme {
+        val dummyPagingData = PagingData.from(
+            listOf(
+                TodoModel(
+                    id = 1,
+                    name = "first todo",
+                    important = true,
+                    completed = false
+                ),
+                TodoModel(
+                    id = 2,
+                    name = "second todo",
+                    important = false,
+                    completed = true
+                ),
+            )
+        )
+        // Flow<PagingData<TodoModel>> を作る
+        val dummyFlow = flowOf(dummyPagingData)
+        val todos = dummyFlow.collectAsLazyPagingItems()
+        TodoListContent(
+            snackbar = remember { SnackbarHostState() },
+            query = "",
+            todos = todos,
+            onAction = { _ -> },
+            onNavigateTodoEdit = {},
+            onNavigateTodoAdd = {},
+            uiState = TodoListUiState()
+        )
     }
 }

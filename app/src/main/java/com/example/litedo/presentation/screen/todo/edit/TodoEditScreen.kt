@@ -17,12 +17,15 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.litedo.R
 import com.example.litedo.domain.model.TodoModel
@@ -32,8 +35,15 @@ import com.example.litedo.presentation.component.text.TextPlain
 import com.example.litedo.presentation.component.topbar.TopBar
 import com.example.litedo.presentation.component.topbar.TopBarIconButton
 import com.example.litedo.presentation.navigation.CustomNavType
+import com.example.litedo.presentation.theme.LiteDoTheme
 import com.example.litedo.presentation.util.ObserveEvent
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import kotlin.reflect.typeOf
 
 @Serializable
@@ -54,6 +64,7 @@ fun TodoEditScreen(
     viewmodel: TodoEditViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
 
     ObserveEvent(
         flow = viewmodel.event,
@@ -70,6 +81,24 @@ fun TodoEditScreen(
         }
     )
 
+    TodoEditContent(
+        snackbar = snackbar,
+        onAction = viewmodel::onAction,
+        onNavigateBack = {
+            navController.navigateUp()
+        },
+        uiState = uiState
+    )
+
+}
+
+@Composable
+fun TodoEditContent(
+    snackbar: SnackbarHostState,
+    onAction: (TodoEditAction) -> Unit,
+    onNavigateBack: () -> Unit,
+    uiState: TodoEditUiState
+) {
     Scaffold(
         topBar = {
             TopBar(
@@ -80,7 +109,7 @@ fun TodoEditScreen(
                 },
                 navigationIcon = {
                     TopBarIconButton(
-                        onClick = { navController.navigateUp() },
+                        onClick = onNavigateBack,
                         icon = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = R.string.cd_back_button
                     )
@@ -89,7 +118,9 @@ fun TodoEditScreen(
         },
         floatingActionButton = {
             TodoFloatingActionButton(
-                onClick = viewmodel::onUpdateTodo,
+                onClick = {
+                    onAction(TodoEditAction.UpdateTodo)
+                },
                 icon = Icons.Default.Done,
                 contentDescription = R.string.cd_done_button
             )
@@ -111,19 +142,41 @@ fun TodoEditScreen(
                 .padding(padding)
         ) {
             TodoConfigure(
-                name = viewmodel.name,
-                onNameChange = viewmodel::onNameChange,
-                important = viewmodel.important,
-                onImportantChange = viewmodel::onImportantChange
+                name = uiState.name,
+                onNameChange = {
+                    onAction(TodoEditAction.NameChange(name = it))
+                },
+                important = uiState.important,
+                onImportantChange = {
+                    onAction(TodoEditAction.ImportantChange(important = it))
+                }
             )
             Spacer(
                 modifier = Modifier.height(10.dp)
             )
             Text(
-                text = stringResource(id = R.string.your_created_timestamp, viewmodel.timestamp),
+                text = stringResource(id = R.string.your_created_timestamp, uiState.timestamp),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun TodoEditContentPreview() {
+    LiteDoTheme {
+        val formatter = DateTimeFormatter.ofPattern("yyyy, MMMM d, HH:mm", Locale.getDefault())
+        TodoEditContent(
+            snackbar = remember { SnackbarHostState() },
+            onAction = { _ -> },
+            onNavigateBack = {},
+            uiState = TodoEditUiState(
+                timestamp = Clock.System.now()
+                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                    .toJavaLocalDateTime().format(formatter)
+            )
+        )
     }
 }
