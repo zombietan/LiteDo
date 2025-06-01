@@ -3,7 +3,9 @@ package com.example.litedo.injection.provide
 import android.app.Application
 import androidx.paging.PagingConfig
 import androidx.room.Room
+import com.example.litedo.BuildConfig
 import com.example.litedo.core.constant.PagingConst
+import com.example.litedo.data.local.todo.callback.TodoCallback
 import com.example.litedo.data.local.todo.constant.TodoDatabaseConst
 import com.example.litedo.data.local.todo.dao.TodoDao
 import com.example.litedo.data.local.todo.database.TodoDatabase
@@ -18,6 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import timber.log.Timber
+import javax.inject.Provider
 import javax.inject.Singleton
 
 @Module
@@ -27,18 +30,37 @@ object ApplicationModule {
     @Singleton
     fun provideTodoDatabase(
         application: Application,
-    ): TodoDatabase = Room.databaseBuilder(
-        context = application,
-        klass = TodoDatabase::class.java,
-        name = TodoDatabaseConst.NAME
-    )
-        .addMigrations()
-        .build()
+        todoCallback: TodoCallback
+    ): TodoDatabase {
+        val builder = Room.databaseBuilder(
+            context = application,
+            klass = TodoDatabase::class.java,
+            name = TodoDatabaseConst.NAME
+        )
+        if (BuildConfig.DEBUG) {
+            builder.addCallback(todoCallback)
+        }
+        return builder
+            .addMigrations()
+            .build()
+    }
 
     @Provides
     @Singleton
     @ApplicationScope
     fun provideApplicationScope(): CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    @Provides
+    @Singleton
+    fun provideTodoCallback(
+        application: Application,
+        todoDatabase: Provider<TodoDatabase>,
+        @ApplicationScope applicationScope: CoroutineScope
+    ): TodoCallback = TodoCallback(
+        application = application,
+        db = todoDatabase,
+        scope = applicationScope
+    )
 
 
     @Provides
