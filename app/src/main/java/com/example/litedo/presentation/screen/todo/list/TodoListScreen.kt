@@ -128,7 +128,6 @@ private fun TodoListContent(
             .distinctUntilChanged()
             .filter { it == null }
             .collectLatest {
-                Timber.tag("snackbar").d(it.toString())
                 onAction(TodoListAction.DeletedTodosClear)
             }
     }
