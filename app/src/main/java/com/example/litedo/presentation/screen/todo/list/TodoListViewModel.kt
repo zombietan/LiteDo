@@ -74,8 +74,8 @@ class TodoListViewModel @Inject constructor(
         ) { query, sorting, hideCompleted ->
             Triple(query, sorting, hideCompleted)
         }.flatMapLatest { (query, sorting, hideCompleted) ->
-            this@TodoListViewModel._uiState.update { it.copy(hideCompleted = hideCompleted) }
-            this@TodoListViewModel._uiState.update { it.copy(sorting = sorting) }
+            _uiState.update { it.copy(hideCompleted = hideCompleted) }
+            _uiState.update { it.copy(sorting = sorting) }
             repository.getTodos(
                 query = query,
                 hideCompleted = hideCompleted,
