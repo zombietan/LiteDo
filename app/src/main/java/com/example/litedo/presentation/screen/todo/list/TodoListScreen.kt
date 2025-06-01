@@ -53,7 +53,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.serialization.Serializable
-import timber.log.Timber
 
 @Serializable
 data object TodoListRoute
