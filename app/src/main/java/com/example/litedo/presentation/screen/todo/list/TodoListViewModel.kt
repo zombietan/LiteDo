@@ -29,7 +29,7 @@ data class TodoListUiState(
     val hideCompleted: Boolean = false,
     val sorting: TodoSort? = null,
     val deleteCompletedShown: Boolean = false,
-    val deleteAllShown: Boolean = false,
+    val deleteAllShown: Boolean = false
 )
 
 sealed interface TodoListAction {
