@@ -53,11 +53,9 @@ object ApplicationModule {
     @Provides
     @Singleton
     fun provideTodoCallback(
-        application: Application,
         todoDatabase: Provider<TodoDatabase>,
         @ApplicationScope applicationScope: CoroutineScope
     ): TodoCallback = TodoCallback(
-        application = application,
         db = todoDatabase,
         scope = applicationScope
     )

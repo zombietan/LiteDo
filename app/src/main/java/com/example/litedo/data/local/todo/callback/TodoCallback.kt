@@ -1,6 +1,5 @@
 package com.example.litedo.data.local.todo.callback
 
-import android.app.Application
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.litedo.data.local.todo.database.TodoDatabase
@@ -16,7 +15,6 @@ import javax.inject.Provider
 import kotlin.time.Duration.Companion.seconds
 
 class TodoCallback(
-    private val application: Application,
     private val db: Provider<TodoDatabase>,
     private val scope: CoroutineScope
 ) : RoomDatabase.Callback() {
