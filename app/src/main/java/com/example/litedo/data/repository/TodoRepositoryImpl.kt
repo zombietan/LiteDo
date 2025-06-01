@@ -26,6 +26,12 @@ class TodoRepositoryImpl(
         }
     }
 
+    override suspend fun insertTodos(todos: List<TodoModel>) {
+        withContext(Dispatchers.IO) {
+            dao.insertTodos(todos.toEntity())
+        }
+    }
+
     // Update
     override suspend fun updateTodo(todo: TodoModel) {
         withContext(Dispatchers.IO) {

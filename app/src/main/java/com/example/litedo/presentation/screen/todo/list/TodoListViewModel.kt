@@ -50,6 +50,7 @@ sealed interface TodoListAction {
     data object DeleteCompleted : TodoListAction
     data object DeleteAllDismiss : TodoListAction
     data object DeleteAll : TodoListAction
+    data object DeletedTodosClear : TodoListAction
 }
 
 
@@ -86,7 +87,7 @@ class TodoListViewModel @Inject constructor(
     private val _event = Channel<TodoListEvent>()
     val event: Flow<TodoListEvent> = _event.receiveAsFlow()
 
-    private var deletedTodo: TodoModel? = null
+    private var deletedTodos: MutableList<TodoModel> = mutableListOf()
 
     fun onAction(action: TodoListAction) {
         when (action) {
@@ -157,6 +158,10 @@ class TodoListViewModel @Inject constructor(
             TodoListAction.SearchCollapsed -> {
                 onSearchCollapsed()
             }
+
+            TodoListAction.DeletedTodosClear -> {
+                onDeletedTodosClear()
+            }
         }
     }
 
@@ -179,12 +184,14 @@ class TodoListViewModel @Inject constructor(
     fun onTodoDelete(todo: TodoModel) {
         viewModelScope.launch {
             try {
-                deletedTodo = todo
+                deletedTodos.add(
+                    todo.copy(id = 0)
+                )
                 repository.deleteTodo(todo)
                 _event.send(TodoListEvent.TodoDeleted)
             } catch (e: Exception) {
                 _event.send(TodoListEvent.Error("Error: ${e.message.toString()}"))
-                deletedTodo = null
+                deletedTodos.clear()
             }
         }
     }
@@ -192,17 +199,19 @@ class TodoListViewModel @Inject constructor(
     fun onUndoDeletedTodo() {
         viewModelScope.launch {
             try {
-                deletedTodo?.let { todo ->
-                    repository.insertTodo(
-                        todo.copy(id = 0)
-                    )
+                if (deletedTodos.isNotEmpty()) {
+                    repository.insertTodos(deletedTodos)
+                    deletedTodos.clear()
                 }
-                deletedTodo = null
             } catch (e: Exception) {
                 _event.send(TodoListEvent.Error("Error: ${e.message.toString()}"))
-                deletedTodo = null
+                deletedTodos.clear()
             }
         }
+    }
+
+    fun onDeletedTodosClear() {
+        deletedTodos.clear()
     }
 
     fun onSearchExpanded() {

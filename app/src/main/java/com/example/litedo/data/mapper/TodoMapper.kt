@@ -14,6 +14,10 @@ fun TodoEntity.toModel(): TodoModel {
     )
 }
 
+fun List<TodoEntity>.toModel(): List<TodoModel> {
+    return this.map { it.toModel() }
+}
+
 // Entity
 fun TodoModel.toEntity(): TodoEntity {
     return TodoEntity(
@@ -23,4 +27,8 @@ fun TodoModel.toEntity(): TodoEntity {
         completed = completed,
         timestamp = timestamp
     )
+}
+
+fun List<TodoModel>.toEntity(): List<TodoEntity> {
+    return this.map { it.toEntity() }
 }

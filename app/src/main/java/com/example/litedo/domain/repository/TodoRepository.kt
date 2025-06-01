@@ -9,6 +9,8 @@ interface TodoRepository {
     // Insert
     suspend fun insertTodo(todo: TodoModel)
 
+    suspend fun insertTodos(todos: List<TodoModel>)
+
     // Update
     suspend fun updateTodo(todo: TodoModel)
 

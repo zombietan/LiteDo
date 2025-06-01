@@ -16,8 +16,10 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,8 +48,12 @@ import com.example.litedo.presentation.screen.todo.add.TodoAddRoute
 import com.example.litedo.presentation.screen.todo.edit.TodoEditRoute
 import com.example.litedo.presentation.theme.LiteDoTheme
 import com.example.litedo.presentation.util.ObserveEvent
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.serialization.Serializable
+import timber.log.Timber
 
 @Serializable
 data object TodoListRoute
@@ -85,6 +91,7 @@ fun TodoListScreen(
         }
     )
 
+
     LifecycleEventEffect(
         event = Lifecycle.Event.ON_RESUME,
         onEvent = {}
@@ -116,6 +123,16 @@ private fun TodoListContent(
     onNavigateTodoAdd: () -> Unit,
     uiState: TodoListUiState
 ) {
+    LaunchedEffect(snackbar) {
+        snapshotFlow { snackbar.currentSnackbarData }
+            .distinctUntilChanged()
+            .filter { it == null }
+            .collectLatest {
+                Timber.tag("snackbar").d(it.toString())
+                onAction(TodoListAction.DeletedTodosClear)
+            }
+    }
+
     Scaffold(
         topBar = {
             TopBar(
