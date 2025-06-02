@@ -55,15 +55,15 @@ class TodoAddViewModel @Inject constructor(
     }
 
 
-    fun onNameChange(value: String) {
+    private fun onNameChange(value: String) {
         _uiState.update { it.copy(name = value) }
     }
 
-    fun onImportantChange(value: Boolean) {
+    private fun onImportantChange(value: Boolean) {
         _uiState.update { it.copy(important = value) }
     }
 
-    fun onSaveTodo() {
+    private fun onSaveTodo() {
         viewModelScope.launch {
             if (uiState.value.name.isBlank()) {
                 _event.send(TodoAddEvent.InvalidInput(R.string.error_name))

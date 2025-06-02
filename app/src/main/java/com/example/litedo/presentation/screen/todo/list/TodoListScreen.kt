@@ -79,7 +79,9 @@ fun TodoListScreen(
                             actionLabel = context.getString(R.string.undo),
                             duration = SnackbarDuration.Short
                         )
-                        if (result == SnackbarResult.ActionPerformed) viewModel.onUndoDeletedTodo()
+                        if (result == SnackbarResult.ActionPerformed) {
+                            viewModel::onAction.invoke(TodoListAction.UndoDeletedTodo)
+                        }
                     }
                 }
 
