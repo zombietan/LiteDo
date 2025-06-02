@@ -71,9 +71,9 @@ fun TodoListScreen(
     ObserveEvent(
         flow = viewModel.event,
         onEvent = { event ->
-            if (snackbar.currentSnackbarData == null) {
-                when (event) {
-                    TodoListViewModel.TodoListEvent.TodoDeleted -> {
+            when (event) {
+                TodoListViewModel.TodoListEvent.TodoDeleted -> {
+                    if (snackbar.currentSnackbarData == null) {
                         val result = snackbar.showSnackbar(
                             message = context.getString(R.string.deleted_successfully),
                             actionLabel = context.getString(R.string.undo),
@@ -81,10 +81,10 @@ fun TodoListScreen(
                         )
                         if (result == SnackbarResult.ActionPerformed) viewModel.onUndoDeletedTodo()
                     }
+                }
 
-                    is TodoListViewModel.TodoListEvent.Error -> {
-                        snackbar.showSnackbar(event.errorMessage)
-                    }
+                is TodoListViewModel.TodoListEvent.Error -> {
+                    snackbar.showSnackbar(event.errorMessage)
                 }
             }
         }
