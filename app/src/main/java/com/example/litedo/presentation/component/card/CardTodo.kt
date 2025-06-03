@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +25,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
@@ -53,7 +55,6 @@ import com.example.litedo.presentation.theme.Black
 import com.example.litedo.presentation.theme.LiteDoTheme
 import com.example.litedo.presentation.theme.White
 import kotlinx.coroutines.delay
-
 
 @Composable
 fun CardTodo(
@@ -89,7 +90,7 @@ fun CardTodo(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(2.dp)
+                    .padding(4.dp)
             ) {
                 Checkbox(
                     checked = todo.completed,
@@ -109,12 +110,14 @@ fun CardTodo(
                     modifier = Modifier.weight(1F)
                 )
                 if (todo.important) {
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Image(
                         painter = painterResource(id = R.drawable.ic_warn),
                         contentDescription = stringResource(id = R.string.cd_task_important),
                         modifier = Modifier.size(24.dp)
                     )
+                } else {
+                    Spacer(Modifier.width(32.dp))
                 }
                 Spacer(modifier = Modifier.width(8.dp))
             }
@@ -253,5 +256,64 @@ private fun CardTodoPreview() {
                 )
             }
         }
+    }
+}
+
+
+@Suppress("unused")
+@Composable
+fun ListItemTodo(
+    todo: TodoModel,
+    onClick: (TodoModel) -> Unit,
+    onCheckedChange: (TodoModel, Boolean) -> Unit,
+    onDismiss: (TodoModel) -> Unit
+) {
+    SwipeToDelete(
+        model = todo,
+        onDelete = onDismiss,
+        duration = 700,
+        deleteIcon = Icons.Rounded.Delete,
+        enableDeleteFromStartToEnd = true,
+        enableDeleteFromEndToStart = true,
+        positionalThreshold = 0.35F,
+        inactiveBackgroundColor = Color.LightGray,
+        activeBackgroundColor = MaterialTheme.colorScheme.error,
+        inactiveIconTint = Black,
+        activeIconTint = White,
+    ) {
+        ListItem(
+            headlineContent = {
+                Text(
+                    text = todo.name,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyMedium,
+                    textDecoration = if (todo.completed)
+                        TextDecoration.LineThrough
+                    else
+                        TextDecoration.None,
+                    modifier = Modifier
+                )
+            },
+            leadingContent = {
+                Checkbox(
+                    checked = todo.completed,
+                    onCheckedChange = { checked ->
+                        onCheckedChange(todo, checked)
+                    }
+                )
+            },
+            trailingContent = {
+                if (todo.important) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_warn),
+                        contentDescription = stringResource(id = R.string.cd_task_important),
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            },
+            modifier = Modifier
+                .clickable { onClick(todo) }
+        )
     }
 }
