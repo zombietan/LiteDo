@@ -88,7 +88,7 @@ class TodoListViewModel @Inject constructor(
     private val _event = Channel<TodoListEvent>()
     val event: Flow<TodoListEvent> = _event.receiveAsFlow()
 
-    private var deletedTodos: MutableList<TodoModel> = mutableListOf()
+    private val deletedTodos: MutableList<TodoModel> = mutableListOf()
 
     fun onAction(action: TodoListAction) {
         when (action) {
