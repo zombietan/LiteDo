@@ -21,11 +21,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.litedo.R
@@ -38,7 +38,6 @@ import com.example.litedo.presentation.component.topbar.TopBarIconButton
 import com.example.litedo.presentation.navigation.CustomNavType
 import com.example.litedo.presentation.theme.LiteDoTheme
 import com.example.litedo.presentation.util.ObserveEvent
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toLocalDateTime
@@ -46,6 +45,7 @@ import kotlinx.serialization.Serializable
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.reflect.typeOf
+import kotlin.time.Clock
 
 @Serializable
 data class TodoEditRoute(
@@ -64,7 +64,7 @@ fun TodoEditScreen(
     navController: NavHostController,
     viewmodel: TodoEditViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val uiState by viewmodel.uiState.collectAsStateWithLifecycle()
 
     ObserveEvent(
@@ -72,7 +72,7 @@ fun TodoEditScreen(
         onEvent = { event ->
             when (event) {
                 is TodoEditViewModel.TodoEditEvent.InvalidInput -> {
-                    snackbar.showSnackbar(context.getString(event.messageResId))
+                    snackbar.showSnackbar(resources.getString(event.messageResId))
                 }
 
                 TodoEditViewModel.TodoEditEvent.TodoUpdated -> {

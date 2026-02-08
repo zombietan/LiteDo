@@ -18,9 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.litedo.R
@@ -42,7 +42,7 @@ fun TodoAddScreen(
     navController: NavHostController,
     viewModel: TodoAddViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ObserveEvent(
@@ -50,7 +50,7 @@ fun TodoAddScreen(
         onEvent = { event ->
             when (event) {
                 is TodoAddViewModel.TodoAddEvent.InvalidInput -> {
-                    snackbar.showSnackbar(context.getString(event.messageResId))
+                    snackbar.showSnackbar(resources.getString(event.messageResId))
                 }
 
                 TodoAddViewModel.TodoAddEvent.TodoAdded -> {

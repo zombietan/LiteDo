@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.parcelize)
     alias(libs.plugins.ksp)
@@ -10,12 +9,15 @@ plugins {
 
 android {
     namespace = "com.example.litedo"
-    compileSdk = 35
+    compileSdk {
+        version = release(36)
+    }
+
 
     defaultConfig {
         applicationId = "com.example.litedo"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -35,9 +37,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+
     buildFeatures {
         compose = true
         buildConfig = true

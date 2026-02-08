@@ -1,10 +1,10 @@
 package com.example.litedo.core.util
 
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Instant
 
 object TimeUtil {
     private val zone = TimeZone.currentSystemDefault()

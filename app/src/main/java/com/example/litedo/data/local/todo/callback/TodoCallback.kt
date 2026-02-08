@@ -8,10 +8,10 @@ import com.example.litedo.data.mapper.toEntity
 import com.example.litedo.domain.model.TodoModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import javax.inject.Provider
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
 
 class TodoCallback(

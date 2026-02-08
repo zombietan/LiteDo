@@ -71,10 +71,10 @@ fun CardTodo(
         enableDeleteFromStartToEnd = true,
         enableDeleteFromEndToStart = true,
         positionalThreshold = 0.35F,
-        inactiveBackgroundColor = Color.LightGray,
+        inactiveBackgroundColor = MaterialTheme.colorScheme.errorContainer,
         activeBackgroundColor = MaterialTheme.colorScheme.error,
-        inactiveIconTint = Black,
-        activeIconTint = White,
+        inactiveIconTint = MaterialTheme.colorScheme.onErrorContainer,
+        activeIconTint = MaterialTheme.colorScheme.onError
     ) {
         Card(
             onClick = { onClick(todo) },
@@ -143,21 +143,24 @@ fun <T> SwipeToDelete(
 ) {
     var deleted by rememberSaveable { mutableStateOf(false) }
     val state = rememberSwipeToDismissBoxState(
-        confirmValueChange = { value ->
-            if (
-                (enableDeleteFromStartToEnd && value == SwipeToDismissBoxValue.StartToEnd) ||
-                (enableDeleteFromEndToStart && value == SwipeToDismissBoxValue.EndToStart)
-            ) {
-                deleted = true
-                return@rememberSwipeToDismissBoxState true
-            } else {
-                return@rememberSwipeToDismissBoxState false
-            }
-        },
         positionalThreshold = { distance ->
             distance * positionalThreshold
         }
     )
+
+    LaunchedEffect(key1 = state.currentValue) {
+        when (state.currentValue) {
+            SwipeToDismissBoxValue.StartToEnd -> {
+                if (enableDeleteFromStartToEnd) deleted = true
+            }
+
+            SwipeToDismissBoxValue.EndToStart -> {
+                if (enableDeleteFromEndToStart) deleted = true
+            }
+
+            else -> Unit
+        }
+    }
 
     LaunchedEffect(key1 = deleted) {
         if (deleted) {

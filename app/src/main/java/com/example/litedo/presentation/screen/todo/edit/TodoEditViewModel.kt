@@ -36,7 +36,7 @@ sealed interface TodoEditAction {
 @HiltViewModel
 class TodoEditViewModel @Inject constructor(
     private val repository: TodoRepository,
-    @TimeFormatter private val formatter: DateTimeFormatter,
+    @param:TimeFormatter private val formatter: DateTimeFormatter,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 

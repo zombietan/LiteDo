@@ -1,6 +1,6 @@
 package com.example.litedo.injection.provide
 
-import android.app.Application
+import android.content.Context
 import androidx.paging.PagingConfig
 import androidx.room.Room
 import com.example.litedo.BuildConfig
@@ -15,6 +15,7 @@ import com.example.litedo.injection.annotation.ApplicationScope
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,11 +30,11 @@ object ApplicationModule {
     @Provides
     @Singleton
     fun provideTodoDatabase(
-        application: Application,
+        @ApplicationContext context: Context,
         todoCallback: TodoCallback
     ): TodoDatabase {
         val builder = Room.databaseBuilder(
-            context = application,
+            context = context,
             klass = TodoDatabase::class.java,
             name = TodoDatabaseConst.NAME
         )

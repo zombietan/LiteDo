@@ -1,11 +1,11 @@
 package com.example.litedo.domain.model
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlin.time.Clock
 
 @Serializable
 data class TodoModel(
