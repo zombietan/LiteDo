@@ -5,15 +5,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
 fun <T> ObserveEvent(
     flow: Flow<T>,
-    onEvent: suspend (event: T) -> Unit
+    onEvent: suspend CoroutineScope.(event: T) -> Unit
 ) {
     val owner = LocalLifecycleOwner.current
     LaunchedEffect(
@@ -23,9 +23,7 @@ fun <T> ObserveEvent(
             owner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 withContext(Dispatchers.Main.immediate) {
                     flow.collect { event ->
-                        launch {
-                            onEvent(event)
-                        }
+                        onEvent(event)
                     }
                 }
             }

@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDefaults
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -38,6 +39,8 @@ import com.example.litedo.presentation.component.topbar.TopBarIconButton
 import com.example.litedo.presentation.navigation.CustomNavType
 import com.example.litedo.presentation.theme.LiteDoTheme
 import com.example.litedo.presentation.util.ObserveEvent
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toLocalDateTime
@@ -72,7 +75,16 @@ fun TodoEditScreen(
         onEvent = { event ->
             when (event) {
                 is TodoEditViewModel.TodoEditEvent.InvalidInput -> {
-                    snackbar.showSnackbar(resources.getString(event.messageResId))
+                    launch {
+                        snackbar.showSnackbar(
+                            message = resources.getString(event.messageResId),
+                            duration = SnackbarDuration.Indefinite
+                        )
+                    }
+                    launch {
+                        delay(800)
+                        snackbar.currentSnackbarData?.dismiss()
+                    }
                 }
 
                 TodoEditViewModel.TodoEditEvent.TodoUpdated -> {

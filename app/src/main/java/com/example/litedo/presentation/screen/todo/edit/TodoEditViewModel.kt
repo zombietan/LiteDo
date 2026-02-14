@@ -47,6 +47,8 @@ class TodoEditViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TodoEditUiState())
     val uiState: StateFlow<TodoEditUiState> = _uiState.asStateFlow()
 
+    private var isSaving = false
+
     init {
         _uiState.update {
             it.copy(
@@ -85,11 +87,16 @@ class TodoEditViewModel @Inject constructor(
     }
 
     private fun onUpdateTodo() {
+        if (isSaving) return
+
         viewModelScope.launch {
             if (uiState.value.name.isBlank()) {
                 _event.send(TodoEditEvent.InvalidInput(R.string.error_name))
                 return@launch
             }
+
+            isSaving = true
+
             try {
                 repository.updateTodo(
                     navArg.todo.copy(
@@ -101,6 +108,8 @@ class TodoEditViewModel @Inject constructor(
                 _event.send(TodoEditEvent.TodoUpdated)
             } catch (e: Exception) {
                 _event.send(TodoEditEvent.Error("Error: ${e.message.toString()}"))
+            } finally {
+                isSaving = false
             }
         }
     }
