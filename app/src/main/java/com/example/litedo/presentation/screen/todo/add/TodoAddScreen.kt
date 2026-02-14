@@ -12,11 +12,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDefaults
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +33,8 @@ import com.example.litedo.presentation.component.topbar.TopBar
 import com.example.litedo.presentation.component.topbar.TopBarIconButton
 import com.example.litedo.presentation.theme.LiteDoTheme
 import com.example.litedo.presentation.util.ObserveEvent
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -44,13 +48,22 @@ fun TodoAddScreen(
 ) {
     val resources = LocalResources.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
     ObserveEvent(
         flow = viewModel.event,
         onEvent = { event ->
             when (event) {
                 is TodoAddViewModel.TodoAddEvent.InvalidInput -> {
-                    snackbar.showSnackbar(resources.getString(event.messageResId))
+                    val job = scope.launch {
+                        snackbar.showSnackbar(
+                            message = resources.getString(event.messageResId),
+                            duration = SnackbarDuration.Indefinite
+                        )
+                    }
+                    delay(800)
+                    snackbar.currentSnackbarData?.dismiss()
+                    job.cancel()
                 }
 
                 TodoAddViewModel.TodoAddEvent.TodoAdded -> {

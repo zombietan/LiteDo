@@ -38,6 +38,8 @@ class TodoAddViewModel @Inject constructor(
     private val _event = Channel<TodoAddEvent>()
     val event: Flow<TodoAddEvent> = _event.receiveAsFlow()
 
+    private var isSaving = false
+
     fun onAction(action: TodoAddAction) {
         when (action) {
             is TodoAddAction.ImportantChange -> {
@@ -64,11 +66,16 @@ class TodoAddViewModel @Inject constructor(
     }
 
     private fun onSaveTodo() {
+        if (isSaving) return
+
         viewModelScope.launch {
             if (uiState.value.name.isBlank()) {
                 _event.send(TodoAddEvent.InvalidInput(R.string.error_name))
                 return@launch
             }
+
+            isSaving = true
+
             try {
                 repository.insertTodo(
                     TodoModel(
@@ -79,6 +86,9 @@ class TodoAddViewModel @Inject constructor(
                 _event.send(TodoAddEvent.TodoAdded)
             } catch (e: Exception) {
                 _event.send(TodoAddEvent.Error("Error: ${e.message.toString()}"))
+            } finally {
+                _uiState.update { it.copy(name = "", important = false) }
+                isSaving = false
             }
         }
     }
