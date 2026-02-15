@@ -8,6 +8,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -22,7 +23,7 @@ fun <T> ObserveEvent(
         block = {
             owner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 withContext(Dispatchers.Main.immediate) {
-                    flow.collect { event ->
+                    flow.collectLatest { event ->
                         onEvent(event)
                     }
                 }
