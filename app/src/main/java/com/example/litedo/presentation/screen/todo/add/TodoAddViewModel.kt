@@ -16,15 +16,22 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+sealed interface AddSaveState {
+    data object Idle : AddSaveState
+    data object Saving : AddSaveState
+}
+
 data class TodoAddUiState(
     val name: String = "",
-    val important: Boolean = false
+    val important: Boolean = false,
+    val saveState: AddSaveState = AddSaveState.Idle
 )
 
 sealed interface TodoAddAction {
     data class NameChange(val name: String) : TodoAddAction
     data class ImportantChange(val important: Boolean) : TodoAddAction
     data object SaveTodo : TodoAddAction
+    data object SetIdle : TodoAddAction
 }
 
 @HiltViewModel
@@ -53,9 +60,16 @@ class TodoAddViewModel @Inject constructor(
             TodoAddAction.SaveTodo -> {
                 onSaveTodo()
             }
+
+            TodoAddAction.SetIdle -> {
+                onSetIdle()
+            }
         }
     }
 
+    private fun onSetIdle() {
+        _uiState.update { it.copy(saveState = AddSaveState.Idle) }
+    }
 
     private fun onNameChange(value: String) {
         _uiState.update { it.copy(name = value) }
@@ -67,6 +81,7 @@ class TodoAddViewModel @Inject constructor(
 
     private fun onSaveTodo() {
         if (isSaving) return
+        _uiState.update { it.copy(saveState = AddSaveState.Saving) }
 
         viewModelScope.launch {
             if (uiState.value.name.isBlank()) {

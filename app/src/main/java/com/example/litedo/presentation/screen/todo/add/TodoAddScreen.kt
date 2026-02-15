@@ -51,6 +51,7 @@ fun TodoAddScreen(
     ObserveEvent(
         flow = viewModel.event,
         onEvent = { event ->
+            val onAction = viewModel::onAction
             when (event) {
                 is TodoAddViewModel.TodoAddEvent.InvalidInput -> {
                     launch {
@@ -73,6 +74,7 @@ fun TodoAddScreen(
                     snackbar.showSnackbar(event.errorMessage)
                 }
             }
+            onAction.invoke(TodoAddAction.SetIdle)
         }
     )
 
@@ -111,13 +113,19 @@ private fun TodoAddContent(
             )
         },
         floatingActionButton = {
-            TodoFloatingActionButton(
-                onClick = {
-                    onAction(TodoAddAction.SaveTodo)
-                },
-                icon = Icons.Default.Done,
-                contentDescription = R.string.cd_done_button
-            )
+            when (uiState.saveState) {
+                AddSaveState.Idle -> {
+                    TodoFloatingActionButton(
+                        onClick = {
+                            onAction(TodoAddAction.SaveTodo)
+                        },
+                        icon = Icons.Default.Done,
+                        contentDescription = R.string.cd_done_button
+                    )
+                }
+
+                AddSaveState.Saving -> {}
+            }
         },
         snackbarHost = {
             SnackbarHost(

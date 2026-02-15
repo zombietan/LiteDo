@@ -21,16 +21,23 @@ import kotlinx.datetime.toJavaLocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
+sealed interface EditSaveState {
+    data object Idle: EditSaveState
+    data object Saving: EditSaveState
+}
+
 data class TodoEditUiState(
     val name: String = "",
     val important: Boolean = false,
-    val timestamp: String = ""
+    val timestamp: String = "",
+    val saveState: EditSaveState = EditSaveState.Idle
 )
 
 sealed interface TodoEditAction {
     data class NameChange(val name: String) : TodoEditAction
     data class ImportantChange(val important: Boolean) : TodoEditAction
     data object UpdateTodo : TodoEditAction
+    data object SetIdle : TodoEditAction
 }
 
 @HiltViewModel
@@ -75,7 +82,15 @@ class TodoEditViewModel @Inject constructor(
             TodoEditAction.UpdateTodo -> {
                 onUpdateTodo()
             }
+
+            TodoEditAction.SetIdle -> {
+                onSetIdle()
+            }
         }
+    }
+
+    private fun onSetIdle() {
+        _uiState.update { it.copy(saveState = EditSaveState.Idle) }
     }
 
     private fun onNameChange(value: String) {
@@ -88,6 +103,7 @@ class TodoEditViewModel @Inject constructor(
 
     private fun onUpdateTodo() {
         if (isSaving) return
+        _uiState.update { it.copy(saveState = EditSaveState.Saving) }
 
         viewModelScope.launch {
             if (uiState.value.name.isBlank()) {
